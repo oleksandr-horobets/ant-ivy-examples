@@ -1,0 +1,43 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="hello-ivy" default="run">
+
+    <property name="ivy.dir" value="${basedir}/ivy"/>
+    <property name="build.dir" value="${basedir}/target"/>
+    <property name="lib.dir" value="${build.dir}/lib"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="src.dir" value="${basedir}/src/main/java"/>
+
+    <path id="ivy.path">
+        <fileset dir="${ivy.dir}"/>
+    </path>
+
+    <path id="compile.path">
+        <fileset dir="${lib.dir}"/>
+    </path>
+
+    <path id="runtime.path">
+        <path refid="compile.path"/>
+        <path location="${classes.dir}"/>
+    </path>
+
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.path"/>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="retrieve">
+        <ivy:retrieve pattern="${lib.dir}/[organisation]-[artifact]-[revision]-[type].[ext]"/>
+    </target>
+
+    <target name="compile" depends="retrieve">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="compile.path"/>
+    </target>
+
+    <target name="run" depends="compile">
+        <java classpathref="runtime.path" classname="hello.Hello">
+            <arg value="Hello"/>
+            <arg value="world!"/>
+        </java>
+    </target>
+</project>
